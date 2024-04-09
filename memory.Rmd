@@ -1,0 +1,84 @@
+---
+title: "project"
+author: "Musya matheka"
+date: "2024-02-29"
+output: html_document
+---
+
+```{R}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(readxl)
+data<- read_xlsx('C:/Users/mannuh/Desktop/memory.xlsx', sheet = 'in')
+head(data)
+
+CleanData<- mutate(data, 
+                  'AVGTRM'= (T1RM+T2RM+T3RM+T4RM+T5RM)/5, 
+                  'AVGTRH'= (T1RH+T2RH+T3RH+T4RH+T5RH)/5,
+                  'AVGTWH'= (T1WH+T2WH+T3WH+T4WH+T5WH)/5,
+                  'AVGTADI'= (T1ADI+T2ADI+T3ADI+T4ADI+T5ADI)/5,
+                  'AVGTWM'= (T1WM+T2WM+T3WM+T4WM+T5WM)/5)
+anova_A <- lm(AVGTRH ~ AVGTRM + AVGTWH + AVGTADI, data = CleanData)
+ regres<- lm(AVGTRH~Gender+Age, data=CleanData)
+ regression <- lm(AVGTADI~ Age+Gender, data=CleanData)
+   
+```
+
+
+```{R}
+View(CleanData)
+CleanDat <- select(CleanData, Gender, Age, AVGTRM, AVGTRH, AVGTWH, AVGTWM, AVGTADI)
+View(CleanDat)
+anova_AVGTRM <- lm(AVGTRM ~ Gender + Age, data = CleanData)
+anova_AVGTRH <- lm(AVGTRH ~ Gender + Age, data = CleanData)
+anova_AVGTWH <- lm(AVGTWH ~ Gender + Age, data = CleanData)
+anova_AVGTADI <- lm(AVGTADI ~ Gender + Age, data = CleanData)
+summary(anova_AVGTADI)
+summary(anova_AVGTRH)
+summary(anova_AVGTRM)
+summary(anova_AVGTWH)
+```
+
+```{R}
+summary(anova_A)
+summary(regression)
+t<- t.test(CleanDat$AVGTRH,CleanDat$AVGTWM)
+print(t)
+```
+
+
+```{R}
+summary(regres)
+```
+
+```{R}
+summary(CleanDat$AVGTADI)
+FData<- subset(CleanDat, Age <= 24)
+boxplot(FData$Age, main = "Boxplot of AVGNTP")
+boxplot(FData$AVGTADI, main = "Boxplot of AVGNTP")
+```
+
+
+```{R }
+regres<- lm(AVGTRH~Gender+Age, data=FData)
+summary(regres)
+ggplot(FData,mapping =aes(x=Gender,fill=Gender))+
+  geom_bar() +
+  labs(title = "bar graph of gender",
+       x = "gender",
+       y = "count")+
+  theme_minimal()
+ boxplot(CleanDat$AVGTADI, main = "Boxplot of AVGNTP")
+ ggplot(FData,mapping =aes(x=AVGTRH, y=Age))+
+  geom_point() +
+  labs(title = "Scatter Plot of  Average TADI Vs Age   ",
+       x = " Age",
+       y = "average TADI")+
+  theme_minimal()
+```
+
+```{R}
+corre<-cor(FData[,c('AVGTRH','AVGTRM')])
+print(corre)
+```
